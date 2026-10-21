@@ -79,6 +79,8 @@ def main(dist, version, out, local=False):
         shutil.copy(f["pkg_src"], out / "firmware" / f["pkg_src"].name)
         if f["emu"]:
             shutil.copytree(f["emu"], out / "emu" / f["id"])
+            e = out / "emu" / f["id"] / "index.html"             # the page says the firmware's name as the screen does
+            e.write_text(e.read_text(encoding="utf-8").replace(f["conf"].get("name", f["id"]), f["name"]), encoding="utf-8")
         if f["manual"]:
             (out / "manual" / f["id"]).mkdir(parents=True)
             subprocess.run([sys.executable, str(BASE / "tools" / "manual_html.py"), str(f["manual"]),

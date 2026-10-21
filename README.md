@@ -40,7 +40,7 @@ Everything is built on [fm1-base](https://github.com/charlesvestal/fm1-base) (`b
 ```bash
 sh tools/get_toolchain.sh          # JieLi's clang for the pi32v2, into ~/.jieli/toolchain
 sh tools/get_sdk.sh                # the three JieLi SDK files the package needs, into ~/.jieli/ac79-sdk
-pip3 install Pillow                # the fonts are rasterised at build time
+pip3 install Pillow                # the fonts are rasterised at build time (PYTHON=... picks the interpreter that has it)
 sh tools/build.sh worn-tape        # firmware/worn-tape/build/worntape.fwsc (Docker on macOS: the toolchain is Linux x86-64)
 sh tools/build.sh worn-tape --host # the host simulator, then:
 sh tools/test.sh worn-tape         # its scenarios (firmware/worn-tape/tests/*.txt), screenshots and audio in build/scenarios/
