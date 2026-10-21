@@ -1,0 +1,121 @@
+# MIDNIGHT ROUTE in the host simulator: tools/build.sh midnight-route --host, then tools/test.sh midnight-route
+wait 500
+shot boot.png
+expect playing 0
+expect station 0
+# the route as short as it goes (4 min) and quick (140 bpm): a station is about 9 bars, 15 s
+spin K1 -8
+wait 50
+expect par3 4
+tap SEL
+wait 50
+expect view 7
+spin K4 68
+wait 50
+expect par31 140
+tap HOME
+wait 50
+expect view 0
+# depart: the first station, then the second within 20 s
+tap PLAY
+wait 200
+expect playing 1
+shot depart.png
+wait 20000
+expect station >0
+expect bars_total >5
+# tags: white key 6 tapped twice is SKIP, key 8 three times is PEAK; a key held shows the station's numbers
+tapkey w5
+wait 50
+tapkey w5
+wait 50
+expect tag5 2
+tapkey w7
+wait 50
+tapkey w7
+wait 50
+tapkey w7
+wait 50
+expect tag7 3
+expect dens27 >70
+key w9 down
+wait 600
+shot station.png
+key w9 up
+wait 50
+expect tag9 0
+# the chord palette: black key 2 (iv) forbidden
+tapkey b1
+wait 50
+expect palette 2045
+# SELECT scrubs the route: over the skipped station
+spin SELECT 4
+wait 100
+expect station >4
+shot route.png
+# a bookmark on this station
+tap REC
+wait 50
+expect nbookmarks 1
+# the shape and the city (a city brings its root)
+turn ALGO 1
+wait 50
+expect par0 5
+turn PRESET 1
+wait 50
+expect par1 1
+expect par28 2
+# transpose down: the ghost
+tap OCT-
+wait 50
+expect par56 -1
+# the pages
+tap ENV
+wait 50
+expect view 1
+shot density.png
+turn K2 3
+wait 50
+expect par33 3
+tap HOME
+wait 50
+expect view 0
+# hold REC, then OCT+: the bookmarks go
+press REC
+wait 1600
+release REC
+wait 50
+tap OCT+
+wait 50
+expect nbookmarks 0
+expect par56 -1
+tap REC
+wait 50
+expect nbookmarks 1
+# save, then the project survives a restart
+tap SAVE
+wait 50
+expect dirty 0
+expect store_writes 1
+reboot
+wait 600
+expect tag5 2
+expect tag7 3
+expect palette 2045
+expect par0 5
+expect par1 1
+expect nbookmarks 1
+expect par3 4
+# the sound: something comes out at the peak of a Dawn
+spin SELECT 7
+tap PLAY
+wait 200
+expect playing 1
+wav play.wav
+wait 6000
+wavstop
+expect peak_db_min -40
+shot playing.png
+listen
+wait 100
+said MIDNIGHT ROUTE

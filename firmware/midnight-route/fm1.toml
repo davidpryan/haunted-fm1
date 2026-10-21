@@ -1,0 +1,18 @@
+# MIDNIGHT ROUTE's build settings (fm1-base's tools/build.py: tools/build.sh midnight-route)
+name = "MIDNIGHT"              # the build's files: midnight.fwsc; APP_NAME (the screen) is in app.h
+id_prefix = "FM-1_71"          # package identity: dev FM-1_7100, releases FM-1_71XXYYZZ
+usb_manufacturer = "haunted-fm1"
+usb_product = "MIDNIGHT ROUTE FM-1"
+ble = false
+usb_audio_in = true            # the music recordable over USB
+usb_audio_out = false
+words = "words.tsv"
+include = ["../../lib", "dsp"]   # hdsp.h, hui.h (shared by the five firmwares); the engine's header
+o2 = ["dsp/engine.c"]          # the engine, at -O2
+# the site
+tagline = "The arrangement engine"
+blurb = "The song has a shape before it has notes. Pick a route shape, set its length, tag its sixteen stations; the machine fills in the journey: sub, pad, a ghost voice and rain, each as dense as the route says. SELECT scrubs the form."
+colour = "#5a6cc8"
+repo = "https://github.com/thedavidpryan/haunted-fm1"
+licence = "MIT"
+credits = "One of the five haunted firmwares; the reverb is Jon Dattorro's plate."
