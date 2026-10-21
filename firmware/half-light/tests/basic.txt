@@ -1,0 +1,112 @@
+# HALF-LIGHT in the host simulator: tools/build.sh half-light --host, then tools/test.sh half-light
+wait 500
+shot boot.png
+expect playing 0
+expect changes 0
+# the weather starts; Breath down to its minimum (3 s): a change within a few seconds
+tap PLAY
+wait 100
+expect playing 1
+expect nvoices 5
+expect par4 5
+turn K1 -20
+wait 100
+expect par3 3
+wait 7000
+expect changes >0
+shot sky.png
+# the pressure: SELECT offsets the curve
+turn SELECT 30
+wait 100
+expect par2 30
+expect pressure >20
+shot pressure.png
+turn SELECT -30
+wait 100
+expect par2 0
+# a pin: a white key holds its note; a bell: a black key rings a degree
+key w2 down
+wait 50
+key w2 up
+wait 100
+expect pins 1
+key b0 down
+wait 50
+key b0 up
+wait 100
+expect bells 1
+# bells come in seconds: Every down to its minimum, a bell within a short while
+tap SEQ
+wait 50
+expect view 3
+turn K1 -12
+wait 100
+expect par15 2
+wait 8000
+expect bellsfired >0
+shot bells.png
+tap HOME
+wait 50
+expect view 0
+# freeze: the chord held, the pressure stopped
+tap REC
+wait 100
+expect frozen 1
+shot frozen.png
+expect frozen 1
+tap REC
+wait 100
+expect frozen 0
+# the pages
+tap ENV
+wait 50
+expect view 1
+shot swell.png
+turn K1 3
+wait 50
+expect par7 53
+tap GLO
+wait 50
+shot words.png
+tap HOME
+wait 50
+# the climate and the voice
+turn ALGO 2
+wait 50
+expect par0 3
+turn PRESET 1
+wait 50
+expect par1 1
+# the register
+tap OCT-
+wait 50
+expect par39 -1
+# save, then the project survives a restart
+tap SAVE
+wait 50
+expect dirty 0
+expect store_writes 1
+reboot
+wait 600
+expect par0 3
+expect par1 1
+expect par3 3
+expect pins 1
+expect bells 1
+expect par39 -1
+# the sound: something comes out
+tap PLAY
+wait 100
+expect playing 1
+wait 4000
+wav play.wav
+wait 3000
+wavstop
+expect peak_db_min -40
+listen
+wait 100
+said HALF-LIGHT
+# stop: the voices release over Breath seconds
+tap PLAY
+wait 100
+expect playing 0

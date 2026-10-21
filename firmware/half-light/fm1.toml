@@ -1,0 +1,18 @@
+# HALF-LIGHT's build settings (fm1-base's tools/build.py: tools/build.sh half-light)
+name = "HALFLIGHT"             # the build's files: halflight.fwsc; APP_NAME (the screen) is in app.h
+id_prefix = "FM-1_74"          # package identity: dev FM-1_7400, releases FM-1_74XXYYZZ
+usb_manufacturer = "haunted-fm1"
+usb_product = "HALF-LIGHT FM-1"
+ble = false
+usb_audio_in = false
+usb_audio_out = false
+words = "words.tsv"
+include = ["../../lib", "dsp"]   # hdsp.h, hui.h (shared by the five firmwares); the engine's header
+o2 = ["dsp/engine.c"]          # the engine, at -O2
+# the site
+tagline = "Harmonic weather"
+blurb = "No grid: time is in seconds. Eight voices hold a chord and move by voice-leading under a pressure that builds and breaks in fronts. SELECT is the pressure; the keys pin notes and ring bells."
+colour = "#4a3f8f"
+repo = "https://github.com/thedavidpryan/haunted-fm1"
+licence = "MIT"
+credits = "One of the five haunted firmwares; the reverb is Jon Dattorro's plate."
