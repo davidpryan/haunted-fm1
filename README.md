@@ -67,8 +67,8 @@ web/site.html        the flasher page (fm1-base's installer code inlined)
 
 Every push to `main` builds the five packages on GitHub's Linux runners (the toolchain runs natively there), runs
 each firmware's host-simulator scenarios, builds the browser emulators, assembles the site and publishes it on GitHub
-Pages (turn on Pages with Source "GitHub Actions" in the repository settings once). A tag `vX.Y` also makes a
-release with the five packages. Pull requests build and test without publishing.
+Pages (turn on Pages with Source "GitHub Actions" in the repository settings once). A tag `vX.Y` (matching the `VERSION` file) also makes
+a release with the five packages; the site is deployed from `main` only. Pull requests build and test without publishing.
 
 ## Licence
 
