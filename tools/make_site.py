@@ -86,6 +86,12 @@ def main(dist, version, out, local=False):
                             "--tagline", f["tagline"]], check=True)
             if f["img"]:
                 shutil.copytree(f["img"], out / "manual" / f["id"] / "img")
+            # fm1-base's manual expects a site of its own (../emu/, ../install/); here the five share one
+            m = out / "manual" / f["id"] / "index.html"
+            h = m.read_text(encoding="utf-8")
+            h = h.replace('href="../emu/"', f'href="../../emu/{f["id"]}/"').replace('href="../install/"', 'href="../../"')
+            h = h.replace('href="../manual/"', 'href="./"').replace('class="home" href="../"', 'class="home" href="../../"')
+            m.write_text(h, encoding="utf-8")
         if (ROOT / "firmware" / f["id"] / "web" / "words").is_dir():     # the screen reader's words files, every one
             shutil.copytree(ROOT / "firmware" / f["id"] / "web" / "words", out / "words" / f["id"])
         meta.append({k: f[k] for k in ("id", "name", "tagline", "blurb", "colour", "product", "pkg", "size")}
