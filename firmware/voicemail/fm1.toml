@@ -13,6 +13,6 @@ o2 = ["dsp/engine.c"]          # the engine, at -O2
 tagline = "The ghost-vocal fragment machine"
 blurb = "A voice that almost says something. A formant singer sings phrases, not steps: a call, an answer, a chorus, a silence. SELECT drops the pitch with the throat held, and Fragment, Stutter and Reverse cut the words to pieces."
 colour = "#6a7fa8"
-repo = "https://github.com/thedavidpryan/haunted-fm1"
+repo = "https://github.com/davidpryan/haunted-fm1"
 licence = "MIT"
 credits = "One of the five haunted firmwares; the reverb is Jon Dattorro's plate, the vowels Peterson and Barney's."

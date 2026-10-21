@@ -13,6 +13,6 @@ o2 = ["dsp/engine.c"]          # the engine, at -O2
 tagline = "Harmonic weather"
 blurb = "No grid: time is in seconds. Eight voices hold a chord and move by voice-leading under a pressure that builds and breaks in fronts. SELECT is the pressure; the keys pin notes and ring bells."
 colour = "#4a3f8f"
-repo = "https://github.com/thedavidpryan/haunted-fm1"
+repo = "https://github.com/davidpryan/haunted-fm1"
 licence = "MIT"
 credits = "One of the five haunted firmwares; the reverb is Jon Dattorro's plate."

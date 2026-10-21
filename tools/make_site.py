@@ -32,7 +32,7 @@ from build import read_conf  # noqa: E402
 FIRMWARES = ["midnight-route", "voicemail", "untrue-step", "half-light", "worn-tape"]
 TITLES = {"midnight-route": "MIDNIGHT ROUTE", "voicemail": "VOICEMAIL", "untrue-step": "UNTRUE STEP",
           "half-light": "HALF-LIGHT", "worn-tape": "WORN TAPE"}        # as the screens say them (fm1.toml's name names files)
-REPO = "https://github.com/thedavidpryan/haunted-fm1"
+REPO = "https://github.com/davidpryan/haunted-fm1"
 
 
 def gather(dist, local):

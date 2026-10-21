@@ -13,6 +13,6 @@ o2 = ["dsp/engine.c"]          # the engine, at -O2
 tagline = "The loop that decays"
 blurb = "Play a short loop. Every pass is a new generation: notes drop out, new ones grow in the holes, the tape sags and hisses. SELECT is the tape's age, and it runs both ways."
 colour = "#b07a45"
-repo = "https://github.com/thedavidpryan/haunted-fm1"
+repo = "https://github.com/davidpryan/haunted-fm1"
 licence = "MIT"
 credits = "One of the five haunted firmwares; the reverb is Jon Dattorro's plate."

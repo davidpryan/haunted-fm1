@@ -13,6 +13,6 @@ o2 = ["dsp/engine.c"]          # the engine, at -O2
 tagline = "Ghost garage without a grid"
 blurb = "No step grid: every hit is an event with a time in milliseconds, a spread and a drag. SELECT bends the timing from push to swing, Loose smears it, and every so often the drums leave and come back changed."
 colour = "#5a6e8c"
-repo = "https://github.com/thedavidpryan/haunted-fm1"
+repo = "https://github.com/davidpryan/haunted-fm1"
 licence = "MIT"
 credits = "One of the five haunted firmwares; the reverb is Jon Dattorro's plate."
