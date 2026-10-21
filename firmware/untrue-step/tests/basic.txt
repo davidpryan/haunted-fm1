@@ -1,0 +1,165 @@
+# UNTRUE STEP in the host simulator: tools/build.sh untrue-step --host, then tools/test.sh untrue-step
+wait 500
+shot boot.png
+expect playing 0
+expect nev 22
+# play: the cycle comes round (two bars at 132 bpm: about 3.6 s)
+tap PLAY
+wait 100
+expect playing 1
+wait 8000
+expect cycle >1
+expect bar >3
+shot home.png
+# Loose to 0, so an event's time is its written time; then SELECT bends it: swing late, push early
+spin K1 -30
+wait 50
+expect par3 0
+wait 4000
+expect eff10 <540
+spin SELECT 50
+wait 100
+expect par2 50
+expect eff10 >600
+shot swing.png
+wait 3000
+spin SELECT -100
+wait 100
+expect par2 -50
+expect eff10 <420
+wait 3000
+spin SELECT 50
+wait 100
+expect par2 0
+# the snare lane; SEQ + a white key: an event near that anchor
+key b1 down
+wait 50
+key b1 up
+expect lane 1
+press SEQ
+wait 50
+key w5 down
+wait 50
+key w5 up
+release SEQ
+wait 100
+expect nuser 1
+expect nev 23
+expect view 0
+# REC held + a white key: a hit kept at the moment it was played
+press REC
+wait 100
+key w9 down
+wait 50
+key w9 up
+wait 50
+expect recording 1
+release REC
+wait 100
+expect recording 0
+expect nuser 2
+expect nev 24
+expect dirty 1
+# the Events page: the hit just kept is selected; a black key nudges it
+tap SEQ
+wait 50
+expect view 3
+expect sel 23
+shot events.png
+key b7 down
+wait 50
+key b7 up
+wait 100
+turn K3 -10
+wait 100
+expect nuser 2
+tap HOME
+wait 50
+expect view 0
+# LEAVE: every 4 bars, always, away 2: the drums go within four bars
+tap GLO
+wait 1200
+spin K1 -20
+wait 100
+expect par27 4
+spin K3 30
+wait 100
+expect par29 100
+spin K2 -4
+wait 100
+expect par28 2
+shot leave_page.png
+tap HOME
+wait 9000
+expect leaves >0
+shot leave.png
+wait 8000
+expect leaves >0
+# the other pages
+tap ENV
+wait 50
+expect view 1
+shot decay.png
+tap LFO
+wait 50
+shot drag.png
+tap ARP
+wait 50
+shot pad.png
+tap FX
+wait 50
+shot sub.png
+tap SEL
+wait 50
+shot key.png
+tap EDIT
+wait 50
+expect view 8
+shot kit.png
+press HOME
+wait 1200
+shot help.png
+release HOME
+wait 50
+tap HOME
+wait 50
+expect view 0
+# the groove and the kit: the edits stay
+turn ALGO 2
+wait 50
+expect par0 2
+expect nuser 2
+turn PRESET 1
+wait 50
+expect par1 1
+# the sub's octave
+tap OCT-
+wait 50
+expect par39 -1
+# save, then the project survives a restart
+tap SAVE
+wait 50
+expect dirty 0
+expect store_writes 1
+reboot
+wait 600
+expect nuser 2
+expect par0 2
+expect par27 4
+expect par39 -1
+expect playing 0
+# the sound: something comes out; MIDI clock drives the tempo
+tap PLAY
+wait 200
+wav play.wav
+wait 3000
+wavstop
+expect peak_db_min -40
+clock 96 25
+wait 100
+expect ext 1
+wait 1000
+expect ext 0
+listen
+wait 100
+said UNTRUE STEP

@@ -1,0 +1,18 @@
+# UNTRUE STEP's build settings (fm1-base's tools/build.py: tools/build.sh untrue-step)
+name = "UNTRUE"                # the build's files: untrue.fwsc; APP_NAME (the screen) is in app.h
+id_prefix = "FM-1_73"          # package identity: dev FM-1_7300, releases FM-1_73XXYYZZ
+usb_manufacturer = "haunted-fm1"
+usb_product = "UNTRUE STEP FM-1"
+ble = false
+usb_audio_in = true            # the music recordable over USB
+usb_audio_out = false
+words = "words.tsv"
+include = ["../../lib", "dsp"]   # hdsp.h, hui.h (shared by the five firmwares); the engine's header
+o2 = ["dsp/engine.c"]          # the engine, at -O2
+# the site
+tagline = "Ghost garage without a grid"
+blurb = "No step grid: every hit is an event with a time in milliseconds, a spread and a drag. SELECT bends the timing from push to swing, Loose smears it, and every so often the drums leave and come back changed."
+colour = "#5a6e8c"
+repo = "https://github.com/thedavidpryan/haunted-fm1"
+licence = "MIT"
+credits = "One of the five haunted firmwares; the reverb is Jon Dattorro's plate."
