@@ -1,0 +1,100 @@
+# WORN TAPE in the host simulator: tools/build.sh worn-tape --host, then tools/test.sh worn-tape
+wait 500
+shot boot.png
+expect playing 0
+expect nmaster 0
+# arm, play a loop of four notes (two bars at 76 bpm: 16 eighths, about 6.3 s)
+tap REC
+wait 50
+expect armed 1
+key 4 down
+wait 200
+expect recording 1
+expect playing 1
+key 4 up
+wait 1200
+key 7 down
+wait 200
+key 7 up
+wait 1200
+key 11 down
+wait 200
+key 11 up
+wait 1300
+key 14 down
+wait 300
+key 14 up
+wait 3000
+expect recording 0
+expect nmaster 4
+expect naged 4
+shot loop.png
+# two passes a generation: after about 13 s the tape is a generation older
+wait 13500
+expect age 1
+expect dirty 1
+# SELECT scrubs the age both ways
+spin SELECT 20
+wait 100
+expect age 21
+shot aged.png
+spin SELECT -21
+wait 100
+expect age 0
+expect nalive 4
+# the pages
+tap FX
+wait 50
+expect view 5
+shot wear.png
+turn K1 3
+wait 50
+expect par23 33
+tap HOME
+wait 50
+expect view 0
+# a splice: SEQ held, a black key
+press SEQ
+key 1 down
+wait 50
+key 1 up
+release SEQ
+wait 50
+expect splices 1
+# the medium and the instrument
+turn ALGO 2
+wait 50
+expect par0 2
+turn PRESET 1
+wait 50
+expect par1 1
+# tape speed
+tap OCT-
+wait 50
+expect par39 -1
+# save, then the project survives a restart
+tap SAVE
+wait 50
+expect dirty 0
+expect store_writes 1
+reboot
+wait 600
+expect nmaster 4
+expect par0 2
+expect splices 1
+# commit: the aged notes are the master, age 0
+spin SELECT 10
+wait 100
+press REC
+wait 1600
+release REC
+wait 100
+expect age 0
+# the sound: something comes out, and MIDI clock drives the steps
+wav play.wav
+wait 2000
+wavstop
+expect peak_db_min -40
+listen
+wait 100
+said WORN TAPE

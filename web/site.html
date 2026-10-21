@@ -1,0 +1,226 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MIT
+     Copyright (C) 2026 David Ryan
+     The haunted firmwares' page: the five, and the installer for any of them (fm1-base's web/fm1pkg.js and
+     web/fm1ota.js, MPL-2.0, inlined by tools/make_site.py at /*LIB*/; the firmwares' metadata at /*META*/). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haunted FM-1</title>
+<meta name="description" content="Five generative firmwares for the M-VAVE FM-1 that make haunting ambient music, with an installer that writes them over USB from the browser.">
+<style>
+  :root { --bg: #0e0d10; --card: #17161b; --fg: #e8e2d9; --dim: #9a9188; --line: #2a282f; --accent: #d08a4a; --bad: #ff7a66; --ok: #7fd3a8; --focus: #79adff; color-scheme: dark; }
+  :root[data-theme="light"] { --bg: #f4efe6; --card: #fffaf2; --fg: #2a2522; --dim: #6e645c; --line: #ddd4c8; --accent: #b4602a; --bad: #a3271b; --ok: #1f7a4d; color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; padding: 0 16px 64px; }
+  main { max-width: 880px; margin: 0 auto; }
+  header { padding: 56px 0 24px; }
+  h1 { font-size: 2.6rem; font-weight: 300; letter-spacing: .08em; margin: 0; text-transform: uppercase; }
+  .sub { color: var(--dim); margin: .4rem 0 0; max-width: 46rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin: 24px 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 14px; display: flex; flex-direction: column; gap: 8px; border-top: 4px solid var(--c, var(--accent)); }
+  .card h2 { margin: 0; font-size: 1.25rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+  .card .tag { color: var(--dim); font-size: .95rem; margin: 0; }
+  .card p.blurb { margin: 0; font-size: .95rem; flex: 1; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  button, .btn { font: inherit; font-size: .95rem; border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 999px; padding: 6px 14px; cursor: pointer; text-decoration: none; }
+  button.primary { background: var(--c, var(--accent)); color: #111; border-color: transparent; font-weight: 600; }
+  button:disabled { opacity: .45; cursor: default; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  a { color: var(--fg); }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin: 24px 0; }
+  .panel h2 { margin: 0 0 8px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: .05em; }
+  .small { color: var(--dim); font-size: .9rem; }
+  progress { width: 100%; height: 8px; margin-top: 12px; accent-color: var(--accent); }
+  #status { margin: 10px 0 0; min-height: 1.6em; }
+  #alert { color: var(--bad); font-weight: 600; margin: 6px 0 0; }
+  #alert:empty { display: none; }
+  pre { color: var(--dim); font-size: 12px; white-space: pre-wrap; margin: 10px 0 0; max-height: 14em; overflow: auto; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  input[type=file] { font: inherit; font-size: .9rem; color: var(--fg); max-width: 100%; }
+  ol { margin: 0 0 10px; padding-left: 20px; }
+  footer { color: var(--dim); font-size: .85rem; margin-top: 40px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>Haunted FM-1</h1>
+  <p class="sub">Five generative firmwares for the M-VAVE FM-1, each built around one idea: the shape of a song, a voice
+  that almost says something, timing that is never on the grid, harmony as weather, a tape loop that wears out. Install
+  one from this page with the FM-1 on USB (Chrome or Edge), or try it in the browser first. Version {{VERSION}}.</p>
+</header>
+
+<section class="cards" id="cards" aria-label="The firmwares"></section>
+
+<section class="panel" id="installer" hidden>
+  <h2 id="insttitle">Install</h2>
+  <p class="small">Connect the FM-1 by USB, then press Install. The browser asks once to allow MIDI: allow it. Do not
+  unplug while it writes. Connect the cable to the computer directly; no other MIDI software should have the FM-1 open.</p>
+  <p><button type="button" class="primary" id="go" disabled>Install</button>
+     <button type="button" id="cancelsel">Choose another</button></p>
+  <label class="sr" for="bar">Progress</label>
+  <progress id="bar" max="100" value="0"></progress>
+  <p id="status" role="status"></p>
+  <p id="alert" role="alert"></p>
+  <pre id="log"></pre>
+</section>
+
+<section class="panel">
+  <h2>Switching between them</h2>
+  <p class="small">Any of the five installs over any other, and over Felucca-family firmware, from this page. Going from
+  M-VAVE's stock firmware works the same way. To go back to the stock firmware, use the section below or M-VAVE's own
+  updater (M-UPGRADE). What a firmware saved on the FM-1 (its loop, its route, its settings) is kept by that firmware
+  only while it is installed; save anything you care about before switching.</p>
+</section>
+
+<section class="panel">
+  <h2>Back to the stock firmware</h2>
+  <p class="small">This writes M-VAVE's FM-1 V15 back over the same cable. M-VAVE's server does not allow this page to
+  download it, so you choose the file:</p>
+  <ol class="small">
+    <li>Download M-VAVE's FM-1 V15: <a href="https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">FM-1.fwsc</a></li>
+    <li><label for="stockfile">Choose the file you downloaded:</label><br><input type="file" id="stockfile" accept=".fwsc"></li>
+    <li>Connect the FM-1 by USB and press the button.</li>
+  </ol>
+  <p><button type="button" id="stockgo" disabled>Install the stock firmware</button></p>
+  <p id="stockstatus" class="small" role="status"></p>
+  <p class="small">An FM-1 that fails to start twice comes up in a safe mode this page can reach. If it does not start at
+  all, <a href="https://github.com/hugelton/felucca-bsp/tree/main/tools">felucca-bsp's rescue tool</a> puts the stock
+  firmware back through the chip's own update mode.</p>
+</section>
+
+<footer>
+  <p>Source: <a href="{{REPO}}">{{REPO}}</a> (MIT). Built on <a href="https://github.com/charlesvestal/fm1-base">fm1-base</a>
+  and <a href="https://github.com/hugelton/felucca-bsp">felucca-bsp</a>, from Felucca by Leo Kuroshita (Hügelton
+  Instruments); the installer is fm1-base's (MPL-2.0). M-VAVE and FM-1 are trademarks of their owners; this project is
+  not affiliated with M-VAVE. Installing firmware is at your own risk.</p>
+</footer>
+</main>
+<script type="module">
+/*LIB*/
+const META = /*META*/;
+const $ = (id) => document.getElementById(id);
+const log = (t) => { $("log").textContent += t + "\n"; };
+const say = (t) => { $("alert").textContent = ""; $("status").textContent = t; };
+const fail = (t) => { $("status").textContent = ""; $("alert").textContent = t; };
+const WORDS = {
+  denied: "MIDI (SysEx) access was not allowed. Allow MIDI in the site settings (address bar) and press Install again.",
+  notfound: "FM-1 not found. Check the USB cable (a data cable), close other apps that use MIDI, and press Install again.",
+  model: "The connected device is not an FM-1.",
+  lost: "The USB connection was lost. Replug it and press Install again.",
+  stopped: "Stopped. Replug the USB cable and press Install again.",
+  noloader: "The FM-1 in update mode was not found. Replug the USB cable and press Install again (it stays in update mode until it is finished).",
+  noreturn: "The FM-1 did not come back. Power-cycle it.",
+  mismatch: "Written, but the FM-1 reports another version: ",
+  badreq: "The FM-1 asked for something outside the package. Replug and try again.",
+  open: "This FM-1 runs M-VAVE's open firmware. Put the stock firmware back first (below), then install this.",
+};
+let chosen = null, image = null, writing = false, stock = null;
+
+function card(f) {
+  const el = document.createElement("article");
+  el.className = "card";
+  el.style.setProperty("--c", f.colour);
+  const kb = (f.size / 1024).toFixed(0);
+  el.innerHTML = `<h2>${f.name}</h2><p class="tag">${f.tagline}</p><p class="blurb">${f.blurb}</p>
+    <div class="row"><button type="button" class="primary" data-install="${f.id}">Install</button>
+    ${f.emu ? `<a class="btn" href="emu/${f.id}/">Try in the browser</a>` : ""}
+    ${f.manual ? `<a class="btn" href="manual/${f.id}/">Manual</a>` : ""}
+    <a class="btn" href="${f.pkg}" download>Download (${kb} KB)</a></div>`;
+  return el;
+}
+for (const f of META.firmwares) $("cards").appendChild(card(f));
+
+$("cards").addEventListener("click", async (ev) => {
+  const b = ev.target.closest("button[data-install]");
+  if (!b || writing) return;
+  chosen = META.firmwares.find((f) => f.id === b.dataset.install);
+  image = null;
+  $("installer").hidden = false;
+  $("insttitle").textContent = `Install ${chosen.name} ${META.version}`;
+  $("go").disabled = true;
+  $("bar").value = 0;
+  $("log").textContent = "";
+  $("installer").scrollIntoView({ behavior: "smooth", block: "start" });
+  if (!navigator.requestMIDIAccess) { fail("This browser cannot do it. Open the page in Chrome or Edge."); return; }
+  try {
+    say("Loading the package…");
+    const r = await fetch(chosen.pkg);
+    if (!r.ok) throw new Error(`${chosen.pkg}: HTTP ${r.status}`);
+    const pkg = new Uint8Array(await r.arrayBuffer());
+    if (productOf(pkg) !== chosen.product) { fail("The package on the site is damaged. Reload the page."); return; }
+    image = logicalImage(pkg);
+    say(`${chosen.name} ${META.version} (${chosen.product}) is ready. Connect the FM-1 and press Install.`);
+    $("go").disabled = false;
+  } catch (e) { fail("Could not load: " + e.message); }
+});
+$("cancelsel").addEventListener("click", () => { if (!writing) { $("installer").hidden = true; chosen = null; } });
+
+window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault(); e.returnValue = "Writing. Do not close the page."; } });
+
+async function run(img, product, isStock) {
+  let midi;
+  try { midi = await navigator.requestMIDIAccess({ sysex: true }); }
+  catch (e) { fail(WORDS.denied); return; }
+  writing = true;
+  $("go").disabled = $("stockgo").disabled = true;
+  const total = 74 + 1167;
+  try {
+    const up = new Updater(midi, log);
+    const step = (k, a) => {
+      log(`${k} ${a ?? ""}`);
+      if (k === "start") say("Starting…");
+      if (k === "verify") { $("bar").value = (a / total) * 100; say(`Verifying, ${Math.round($("bar").value)} %`); }
+      if (k === "loader") say("Switching to update mode…");
+      if (k === "write") { $("bar").value = ((74 + a) / total) * 100; say(`Writing, ${Math.round($("bar").value)} %`); }
+      if (k === "reboot") say("Restarting…");
+      if (k === "done") { $("bar").value = 100; say(isStock ? "Done. The FM-1 has restarted with its original firmware." : `Done. The FM-1 is running ${chosen ? chosen.name : "it"}.`); }
+    };
+    const ota = await up.find((id) => /^ota-/i.test(id.model));
+    if (ota) {
+      ota.link.close();
+      say("The FM-1 is already in update mode: resuming the write.");
+      if (await up.resume(img, step)) step("done"); else fail(WORDS.stopped);
+    } else {
+      await up.install(img, product, step);
+    }
+  } catch (e) {
+    if (isStock && e && e.code === "mismatch") { $("bar").value = 100; say("Done. The FM-1 has restarted with its original firmware."); }
+    else if (e && e.code && WORDS[e.code]) fail(WORDS[e.code] + (e.detail || ""));
+    else fail("Error: " + (e && e.message));
+    log(String(e && e.stack || e));
+  }
+  writing = false;
+  $("go").disabled = !image;
+  $("stockgo").disabled = !stock;
+}
+$("go").addEventListener("click", () => { if (image && chosen) run(image, chosen.product, false); });
+
+$("stockfile").addEventListener("change", async (e) => {
+  stock = null;
+  $("stockgo").disabled = true;
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  try {
+    const raw = new Uint8Array(await f.arrayBuffer());
+    const hex = [...new Uint8Array(await crypto.subtle.digest("SHA-256", raw))].map((b) => b.toString(16).padStart(2, "0")).join("");
+    if (hex !== STOCK_SHA256) { $("stockstatus").textContent = "That is not M-VAVE's FM-1 V15 file. Choose the file from the link above."; return; }
+    stock = { image: logicalImage(raw), product: productOf(raw) };
+    $("stockgo").disabled = writing;
+    $("stockstatus").textContent = "That is M-VAVE's FM-1 V15. Press the button to install it.";
+  } catch (err) { $("stockstatus").textContent = "Error: " + (err && err.message); }
+});
+$("stockgo").addEventListener("click", () => {
+  if (!stock) return;
+  $("installer").hidden = false;
+  $("insttitle").textContent = "Install the stock firmware";
+  chosen = null; image = null;
+  $("installer").scrollIntoView({ behavior: "smooth", block: "start" });
+  run(stock.image, stock.product, true);
+});
+</script>
+</body>
+</html>

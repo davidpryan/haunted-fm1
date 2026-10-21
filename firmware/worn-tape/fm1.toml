@@ -1,0 +1,18 @@
+# WORN TAPE's build settings (fm1-base's tools/build.py: tools/build.sh worn-tape)
+name = "WORNTAPE"            # the build's files: worntape.fwsc; APP_NAME (the screen) is in app.h
+id_prefix = "FM-1_75"          # package identity: dev FM-1_7500, releases FM-1_75XXYYZZ
+usb_manufacturer = "haunted-fm1"
+usb_product = "WORN TAPE FM-1"
+ble = false
+usb_audio_in = true            # the music recordable over USB
+usb_audio_out = false
+words = "words.tsv"
+include = ["../../lib", "dsp"]   # hdsp.h, hui.h (shared by the five firmwares); the engine's header
+o2 = ["dsp/engine.c"]          # the engine, at -O2
+# the site
+tagline = "The loop that decays"
+blurb = "Play a short loop. Every pass is a new generation: notes drop out, new ones grow in the holes, the tape sags and hisses. SELECT is the tape's age, and it runs both ways."
+colour = "#b07a45"
+repo = "https://github.com/thedavidpryan/haunted-fm1"
+licence = "MIT"
+credits = "One of the five haunted firmwares; the reverb is Jon Dattorro's plate."
