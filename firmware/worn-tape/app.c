@@ -334,15 +334,15 @@ static void draw_reel(int32_t cx, int32_t cy, int32_t r, float turns, uint16_t c
 static void draw_main(void)
 {
     char t[32], n[12];
-    int32_t i, steps = en_loop_steps, x0 = 20, w = 200, ty = 92, th = 40;
+    int32_t i, steps = en_loop_steps, x0 = 20, w = 200, ty = 82, th = 34;
     int age = en_age, drop = en_dropout;
     uint16_t oxide = mix(K_OXIDE, K_WORN, age / 4), bg = drop ? mix(TH.bg, TH.panel, 6) : TH.bg;
     float spin = en_pos / (float)steps;
     cv_begin(240, HUI_MAIN_H, TH.bg);
-    /* the reels: the left one empties as the age climbs, the right one fills */
-    draw_reel(48, 46, 22 - age / 8, spin * 3.0f, oxide);
-    draw_reel(192, 46, 14 + age / 8, spin * 3.0f * 1.3f, oxide);
-    cv_line(48, 24, 192, 24, TH.line);
+    /* the reels: the left one empties as the age climbs, the right one fills; the tape runs between them */
+    cv_rect(48, 68, 144, 1, mix(bg, oxide, 6));
+    draw_reel(48, 42, 24 - age / 8, spin * 3.0f, oxide);
+    draw_reel(192, 42, 14 + age / 8, spin * 3.0f * 1.3f, oxide);
     /* the tape: the loop, its notes on it */
     cv_rect(x0 - 4, ty - 2, w + 8, th + 4, mix(bg, oxide, 3));
     cv_rect(x0, ty, w, th, mix(bg, oxide, drop ? 1 : 5));
@@ -380,13 +380,13 @@ static void draw_main(void)
     }
     /* the line under it: the generation and the notes; a hint when there is no master yet */
     if (!en_nmaster && !en_recording) {
-        hui_text_c(120, 118, &FONT_XS, en_armed ? "PLAY THE LOOP: ONE PASS" : "REC, THEN PLAY A LOOP", TH.dim);
+        hui_text_c(120, 92, &FONT_XS, en_armed ? "PLAY THE LOOP: ONE PASS" : "REC, THEN PLAY A LOOP", TH.dim);
     } else {
         t[0] = 0;
         h_cat(t, "GEN ");
         h_itoa(age, n);
         h_cat(t, n);
-        cv_text(x0, 118, &FONT_XS, t, age >= 64 ? TH.warn : TH.text);
+        cv_text(x0, 124, &FONT_XS, t, age >= 64 ? TH.warn : TH.text);
         t[0] = 0;
         h_itoa(en_nalive, n);
         h_cat(t, n);
@@ -394,12 +394,12 @@ static void draw_main(void)
         h_itoa(en_naged, n);
         h_cat(t, n);
         h_cat(t, " NOTES");
-        hui_text_c(120, 118, &FONT_XS, t, TH.dim);
-        hui_text_r(x0 + w, 118, &FONT_XS, en_recording ? "REC" : en_armed ? "ARMED" : en_playing ? "PLAY" : "STOP",
+        hui_text_c(120, 124, &FONT_XS, t, TH.dim);
+        hui_text_r(x0 + w, 124, &FONT_XS, en_recording ? "REC" : en_armed ? "ARMED" : en_playing ? "PLAY" : "STOP",
                    en_recording || en_armed ? TH.warn : en_playing ? TH.hi : TH.dim);
     }
     /* the level, a thin line at the bottom */
-    hui_bar(x0, 138, w, 2, en_level * 1.5f, TH.line, oxide);
+    hui_bar(x0, 140, w, 2, en_level * 1.5f, TH.line, oxide);
     cv_blit(0, HUI_MAIN_Y);
 }
 
@@ -412,7 +412,12 @@ static void draw(void)
     char r[12];
     int i;
     /* the header: the medium (greyer as it wears), the instrument; the tempo, or EXT */
-    if (en_ext) {
+    if (ui.view == V_SEL) {                   /* the Key page: the audio load, for the curious */
+        r[0] = 0;
+        h_cat(r, "CPU ");
+        h_itoa((int)plat_cpu_pct(), r + 4);
+        h_cat(r, "%");
+    } else if (en_ext) {
         r[0] = 'E';
         r[1] = 'X';
         r[2] = 'T';

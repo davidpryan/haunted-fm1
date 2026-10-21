@@ -14,6 +14,7 @@ firmware/NAME/build/ instead.
   OUT/firmware/NAME-V.fwsc    the packages
   OUT/emu/NAME/               each firmware in the browser
   OUT/manual/NAME/index.html  each manual (firmware/NAME/docs/MANUAL.md)
+  OUT/words/NAME/             the screen reader's words files (fm1-reader), as words.tsv's url line promises
 The installer code is fm1-base's (web/fm1pkg.js, web/fm1ota.js, MPL-2.0), inlined."""
 import json
 import re
@@ -29,6 +30,8 @@ from make_site import product_of, strip_module  # noqa: E402  (fm1-base's: the p
 from build import read_conf  # noqa: E402
 
 FIRMWARES = ["midnight-route", "voicemail", "untrue-step", "half-light", "worn-tape"]
+TITLES = {"midnight-route": "MIDNIGHT ROUTE", "voicemail": "VOICEMAIL", "untrue-step": "UNTRUE STEP",
+          "half-light": "HALF-LIGHT", "worn-tape": "WORN TAPE"}        # as the screens say them (fm1.toml's name names files)
 REPO = "https://github.com/thedavidpryan/haunted-fm1"
 
 
@@ -48,7 +51,7 @@ def gather(dist, local):
             continue
         pkg = pkgs[-1]
         raw = pkg.read_bytes()
-        out.append({"id": fw, "name": conf.get("name", fw), "tagline": conf.get("tagline", ""),
+        out.append({"id": fw, "name": TITLES.get(fw, conf.get("name", fw)), "tagline": conf.get("tagline", ""),
                     "blurb": conf.get("blurb", ""), "colour": conf.get("colour", "#d08a4a"),
                     "product": product_of(raw), "pkg_src": pkg, "pkg": f"firmware/{pkg.name}", "size": len(raw),
                     "emu": src / "emu" if (src / "emu" / "app.wasm").exists() else None,
@@ -83,6 +86,8 @@ def main(dist, version, out, local=False):
                             "--tagline", f["tagline"]], check=True)
             if f["img"]:
                 shutil.copytree(f["img"], out / "manual" / f["id"] / "img")
+        if (ROOT / "firmware" / f["id"] / "web" / "words").is_dir():     # the screen reader's words files, every one
+            shutil.copytree(ROOT / "firmware" / f["id"] / "web" / "words", out / "words" / f["id"])
         meta.append({k: f[k] for k in ("id", "name", "tagline", "blurb", "colour", "product", "pkg", "size")}
                     | {"emu": bool(f["emu"]), "manual": bool(f["manual"])})
     page = page.replace("/*LIB*/", lib).replace("/*META*/", json.dumps({"version": version, "repo": REPO, "firmwares": meta}))

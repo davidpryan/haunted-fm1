@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: MIT
      Copyright (C) 2026 David Ryan
      The haunted firmwares' page: the five, and the installer for any of them (fm1-base's web/fm1pkg.js and
-     web/fm1ota.js, MPL-2.0, inlined by tools/make_site.py at /*LIB*/; the firmwares' metadata at /*META*/). -->
+     web/fm1ota.js, MPL-2.0, inlined by tools/make_site.py at the LIB marker; the firmwares' metadata at the META one). -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -105,7 +105,7 @@ const META = /*META*/;
 const $ = (id) => document.getElementById(id);
 const log = (t) => { $("log").textContent += t + "\n"; };
 const say = (t) => { $("alert").textContent = ""; $("status").textContent = t; };
-const fail = (t) => { $("status").textContent = ""; $("alert").textContent = t; };
+const oops = (t) => { $("status").textContent = ""; $("alert").textContent = t; };   /* (fail is the library's) */
 const WORDS = {
   denied: "MIDI (SysEx) access was not allowed. Allow MIDI in the site settings (address bar) and press Install again.",
   notfound: "FM-1 not found. Check the USB cable (a data cable), close other apps that use MIDI, and press Install again.",
@@ -145,17 +145,17 @@ $("cards").addEventListener("click", async (ev) => {
   $("bar").value = 0;
   $("log").textContent = "";
   $("installer").scrollIntoView({ behavior: "smooth", block: "start" });
-  if (!navigator.requestMIDIAccess) { fail("This browser cannot do it. Open the page in Chrome or Edge."); return; }
+  if (!navigator.requestMIDIAccess) { oops("This browser cannot do it. Open the page in Chrome or Edge."); return; }
   try {
     say("Loading the package…");
     const r = await fetch(chosen.pkg);
     if (!r.ok) throw new Error(`${chosen.pkg}: HTTP ${r.status}`);
     const pkg = new Uint8Array(await r.arrayBuffer());
-    if (productOf(pkg) !== chosen.product) { fail("The package on the site is damaged. Reload the page."); return; }
+    if (productOf(pkg) !== chosen.product) { oops("The package on the site is damaged. Reload the page."); return; }
     image = logicalImage(pkg);
     say(`${chosen.name} ${META.version} (${chosen.product}) is ready. Connect the FM-1 and press Install.`);
     $("go").disabled = false;
-  } catch (e) { fail("Could not load: " + e.message); }
+  } catch (e) { oops("Could not load: " + e.message); }
 });
 $("cancelsel").addEventListener("click", () => { if (!writing) { $("installer").hidden = true; chosen = null; } });
 
@@ -164,7 +164,7 @@ window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault
 async function run(img, product, isStock) {
   let midi;
   try { midi = await navigator.requestMIDIAccess({ sysex: true }); }
-  catch (e) { fail(WORDS.denied); return; }
+  catch (e) { oops(WORDS.denied); return; }
   writing = true;
   $("go").disabled = $("stockgo").disabled = true;
   const total = 74 + 1167;
@@ -183,14 +183,14 @@ async function run(img, product, isStock) {
     if (ota) {
       ota.link.close();
       say("The FM-1 is already in update mode: resuming the write.");
-      if (await up.resume(img, step)) step("done"); else fail(WORDS.stopped);
+      if (await up.resume(img, step)) step("done"); else oops(WORDS.stopped);
     } else {
       await up.install(img, product, step);
     }
   } catch (e) {
     if (isStock && e && e.code === "mismatch") { $("bar").value = 100; say("Done. The FM-1 has restarted with its original firmware."); }
-    else if (e && e.code && WORDS[e.code]) fail(WORDS[e.code] + (e.detail || ""));
-    else fail("Error: " + (e && e.message));
+    else if (e && e.code && WORDS[e.code]) oops(WORDS[e.code] + (e.detail || ""));
+    else oops("Error: " + (e && e.message));
     log(String(e && e.stack || e));
   }
   writing = false;
