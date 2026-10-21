@@ -337,10 +337,10 @@ static void hui_knobs(const char *const name[4], const float v[4], const char *c
     for (i = 0; i < 4u; i++) {
         int32_t x = 2 + (int32_t)i * 59, lit = (int)i == touched;
         uint16_t c = colour ? colour[i] : TH.hi;
-        hui_round(x, 4, 57, 62, 3, lit ? TH.panel : TH.bg);
-        hui_arc(x + 14, 36, 11, v[i], TH.line, lit ? TH.text : c, bipolar ? bipolar[i] : 0);
-        hui_text_c(x + 28, 5, &FONT_XS, name[i], lit ? TH.text : TH.dim);
-        cv_text(x + 30, 29, &FONT_XS, val[i], TH.text);
+        hui_round(x, 3, 57, 64, 3, lit ? TH.panel : TH.bg);
+        hui_text_c(x + 28, 4, &FONT_XS, name[i], lit ? TH.text : TH.dim);
+        hui_arc(x + 28, 33, 10, v[i], TH.line, lit ? TH.text : c, bipolar ? bipolar[i] : 0);
+        hui_text_c(x + 28, 49, &FONT_XS, val[i], TH.text);   /* the card's whole width: "Phrygian" fits */
     }
     cv_blit(0, HUI_KNB_Y);
 }
