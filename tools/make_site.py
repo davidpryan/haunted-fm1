@@ -45,7 +45,7 @@ def gather(dist, local):
             continue
         conf = read_conf(app / "fm1.toml")
         src = app / "build" if local else Path(dist) / fw
-        pkgs = sorted(src.glob("*.fwsc"))
+        pkgs = sorted(src.glob("*.fwsc"), key=lambda f: f.stat().st_mtime)   # the newest build (a release over a dev one)
         if not pkgs:
             print(f"(no package for {fw} in {src}: skipped)")
             continue
