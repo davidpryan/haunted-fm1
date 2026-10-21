@@ -34,8 +34,35 @@ jobs:
             echo "version=$(cat VERSION)-dev" >> "$GITHUB_OUTPUT"
           fi
 
+  # the toolchain and the SDK fetched once, into the caches the five builds restore (five jobs fetching the SDK at
+  # once from gitee was flaky)
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: JieLi toolchain (cached)
+        id: tc
+        uses: actions/cache@v4
+        with:
+          path: ~/.jieli/toolchain-dir
+          key: jieli-toolchain-${{ hashFiles('base/tools/get_toolchain.sh') }}
+      - if: steps.tc.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/.jieli/toolchain-dir
+          sh tools/get_toolchain.sh ~/.jieli/toolchain-dir
+      - name: JieLi AC79 SDK (cached)
+        id: sdk
+        uses: actions/cache@v4
+        with:
+          path: ~/.jieli/ac79-sdk
+          key: ac79-sdk-${{ hashFiles('base/bsp/tools/get_sdk.sh') }}
+      - if: steps.sdk.outputs.cache-hit != 'true'
+        run: sh tools/get_sdk.sh ~/.jieli/ac79-sdk
+
   build:
-    needs: version
+    needs: [version, prepare]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
